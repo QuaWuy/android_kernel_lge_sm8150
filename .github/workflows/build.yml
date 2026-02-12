@@ -1,0 +1,36 @@
+name: Build Kernel LG G8X (mh2lm)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends \
+            git build-essential bc bison flex \
+            libssl-dev libelf-dev zlib1g-dev \
+            clang lld llvm \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            python3 python3-pip \
+            ninja-build zip ccache
+
+      - name: Make build script executable
+        run: chmod +x build_mh2lm.sh
+
+      - name: Run kernel build
+        run: ./build_mh2lm.sh
+
+      - name: Upload kernel Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-mh2lm
+          path: release/Dragon/Image-mh2lm
